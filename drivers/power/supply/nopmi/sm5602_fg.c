@@ -2760,13 +2760,6 @@ static bool fg_init(struct i2c_client *client)
 	int ret;
 	struct sm_fg_chip *sm = i2c_get_clientdata(client);
 
-	/*sm5602 i2c read check*/
-	ret = fg_get_device_id(client);
-	if (ret < 0) {
-		pr_err("%s: fail to do i2c read(%d)\n", __func__, ret);
-		return false;
-	}
-
 	if (fg_check_reg_init_need(client)) {
 		ret = fg_reset(sm);
 		if (ret < 0) {
@@ -3198,8 +3191,17 @@ static int fg_battery_parse_dt(struct sm_fg_chip *sm)
 bool hal_fg_init(struct i2c_client *client)
 {
 	struct sm_fg_chip *sm = i2c_get_clientdata(client);
+	int ret = 0;
 
 	pr_info("sm5602 hal_fg_init...\n");
+
+	/* sm5602 i2c read check */
+	ret = fg_get_device_id(client);
+	if (ret < 0) {
+		pr_err("%s: fail to do i2c read(%d)\n", __func__, ret);
+		return false;
+	}
+
 	mutex_lock(&sm->data_lock);
 	if (client->dev.of_node) {
 		/* Load common data from DTS*/

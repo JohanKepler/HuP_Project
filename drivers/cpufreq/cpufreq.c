@@ -2301,7 +2301,7 @@ static int cpufreq_set_policy(struct cpufreq_policy *policy,
 
 	/* adjust if necessary - hardware incompatibility */
 	blocking_notifier_call_chain(&cpufreq_policy_notifier_list,
-			CPUFREQ_INCOMPATIBLE, new_policy);
+			CPUFREQ_THERMAL, new_policy);
 
 	/* limit cpufreq by thermal - lc-zhenghao */
 	blocking_notifier_call_chain(&cpufreq_policy_notifier_list,

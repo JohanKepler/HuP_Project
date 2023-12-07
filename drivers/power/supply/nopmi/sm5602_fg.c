@@ -31,7 +31,9 @@
 #include <linux/of_gpio.h>
 #include <linux/gpio.h>
 #include <linux/gpio/consumer.h>
+#ifdef CONFIG_DEBUG_FS
 #include <linux/debugfs.h>
+#endif
 #include <linux/kernel.h>
 #include <linux/regmap.h>
 #include <linux/random.h>
@@ -336,7 +338,9 @@ struct sm_fg_chip {
 };
 
 
+#ifdef CONFIG_DEBUG_FS
 static int show_registers(struct seq_file *m, void *data);
+#endif
 static bool fg_init(struct i2c_client *client);
 static int fg_set_fastcharge_mode(struct sm_fg_chip *sm, bool enable);
 
@@ -1556,6 +1560,7 @@ static int fg_dump_debug(struct sm_fg_chip *sm)
 #endif
 
 
+#ifdef CONFIG_DEBUG_FS
 static int reg_debugfs_open(struct inode *inode, struct file *file)
 {
 	struct sm_fg_chip *sm = inode->i_private;
@@ -1604,6 +1609,7 @@ static int show_registers(struct seq_file *m, void *data)
 	}
 	return 0;
 }
+#endif
 
 static ssize_t fg_attr_show_rm(struct device *dev,
 			       struct device_attribute *attr, char *buf)
@@ -3411,7 +3417,9 @@ static int sm_fg_probe(struct i2c_client *client, const struct i2c_device_id *id
 		return ret;
 	}
 
+#ifdef CONFIG_DEBUG_FS
 	create_debugfs_entry(sm);
+#endif
 
 	ret = sysfs_create_group(&sm->dev->kobj, &fg_attr_group);
 	if (ret)
@@ -3451,7 +3459,9 @@ static int sm_fg_remove(struct i2c_client *client)
 	mutex_destroy(&sm->data_lock);
 	mutex_destroy(&sm->i2c_rw_lock);
 
+#ifdef CONFIG_DEBUG_FS
 	debugfs_remove_recursive(sm->debug_root);
+#endif
 
 	sysfs_remove_group(&sm->dev->kobj, &fg_attr_group);
 

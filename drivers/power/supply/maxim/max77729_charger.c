@@ -10,7 +10,9 @@
 #define DEBUG
 
 #include <linux/mfd/max77729-private.h>
+#ifdef CONFIG_DEBUG_FS
 #include <linux/debugfs.h>
+#endif
 #include <linux/seq_file.h>
 #include <linux/power_supply.h>
 #include <linux/mfd/max77729.h>
@@ -2628,6 +2630,8 @@ int batt_prop_is_writeable(struct power_supply *psy,
 
 	return 0;
 }
+
+#ifdef CONFIG_DEBUG_FS
 static int max77729_debugfs_show(struct seq_file *s, void *data)
 {
 	struct max77729_charger_data *charger = s->private;
@@ -2655,6 +2659,7 @@ static const struct file_operations max77729_debugfs_fops = {
 	.llseek = seq_lseek,
 	.release = single_release,
 };
+#endif
 
 static void max77729_chg_isr_work(struct work_struct *work)
 {
@@ -3962,9 +3967,11 @@ static int max77729_charger_probe(struct platform_device *pdev)
 	charger->input_current = max77729_get_input_current(charger);
 	charger->charging_current = max77729_get_charge_current(charger);
 
+#ifdef CONFIG_DEBUG_FS
 	(void)debugfs_create_file("max77729-regs",
 				S_IRUGO, NULL, (void *)charger,
 				  &max77729_debugfs_fops);
+#endif
 
 	charger->wqueue = create_singlethread_workqueue(dev_name(&pdev->dev));
 	if (!charger->wqueue) {

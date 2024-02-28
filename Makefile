@@ -907,6 +907,30 @@ KBUILD_CFLAGS	+= $(CC_FLAGS_SCS)
 export CC_FLAGS_SCS
 endif
 
+ifdef CONFIG_POLLY_CLANG
+polly-clang-flags += -mllvm -polly \
+		     -mllvm -polly-ast-use-context \
+		     -mllvm -polly-invariant-load-hoisting \
+		     -mllvm -polly-run-inliner \
+		     -mllvm -polly-vectorizer=stripmine
+ifeq ($(shell test $(CONFIG_CLANG_VERSION) -gt 130000; echo $$?),0)
+polly-clang-flags += -mllvm -polly-loopfusion-greedy=1 \
+		     -mllvm -polly-reschedule=1 \
+		     -mllvm -polly-postopts=1
+else
+polly-clang-flags += -mllvm -polly-opt-fusion=max
+endif
+# Polly may optimise loops with dead paths beyound what the linker
+# can understand. This may negate the effect of the linker's DCE
+# so we tell Polly to perfom proven DCE on the loops it optimises
+# in order to preserve the overall effect of the linker's DCE.
+ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
+polly-clang-flags += -mllvm -polly-run-dce
+endif
+POLLY_CFLAGS	:= $(polly-clang-flags)
+KBUILD_CFLAGS	+= $(POLLY_CFLAGS)
+endif
+
 # arch Makefile may override CC so keep this after arch Makefile is included
 NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
 

@@ -2622,14 +2622,9 @@ static unsigned int get_rr_interval_rt(struct rq *rq, struct task_struct *task)
 		return 0;
 }
 
-<<<<<<< HEAD
+#include "cass_rt.h"
 const struct sched_class rt_sched_class = {
 	.next			= &fair_sched_class,
-=======
-#include "cass_rt.h"
-DEFINE_SCHED_CLASS(rt) = {
-
->>>>>>> abdffc6dac6f (sched/cass: Perform runqueue selection for RT tasks too)
 	.enqueue_task		= enqueue_task_rt,
 	.dequeue_task		= dequeue_task_rt,
 	.yield_task		= yield_task_rt,

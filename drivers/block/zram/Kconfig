@@ -31,7 +31,7 @@ config ZRAM_DEDUP
 
 choice
 	prompt "Default zram compressor"
-	default ZRAM_DEF_COMP_LZORLE
+	default ZRAM_DEF_COMP_LZ4KD
 	depends on ZRAM
 
 config ZRAM_DEF_COMP_LZORLE
@@ -58,6 +58,10 @@ config ZRAM_DEF_COMP_842
 	bool "842"
 	depends on CRYPTO_842
 
+config ZRAM_DEF_COMP_LZ4KD
+	bool "lz4kd"
+	select CRYPTO_LZ4KD
+
 endchoice
 
 config ZRAM_DEF_COMP
@@ -68,6 +72,7 @@ config ZRAM_DEF_COMP
 	default "lzo" if ZRAM_DEF_COMP_LZO
 	default "lz4hc" if ZRAM_DEF_COMP_LZ4HC
 	default "842" if ZRAM_DEF_COMP_842
+	default "lz4kd" if ZRAM_DEF_COMP_LZ4KD
 
 config ZRAM_WRITEBACK
        bool "Write back incompressible or idle page to backing device"

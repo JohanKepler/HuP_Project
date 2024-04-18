@@ -1,5 +1,9 @@
 CONFIG_LOCALVERSION="-HuP-R3"
 CONFIG_AUDIT=y
+# CONFIG MEMORY ==============
+CONFIG_KSM=y
+CONFIG_UKSM=y
+#=============================
 # BUILD CONFIG CLANG =========
 CONFIG_THIN_ARCHIVES=y
 CONFIG_LTO=y

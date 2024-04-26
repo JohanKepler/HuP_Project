@@ -8847,11 +8847,11 @@ int can_migrate_task(struct task_struct *p, struct lb_env *env)
 	if (env->flags & LBF_IGNORE_BIG_TASKS &&
 		!task_fits_max(p, env->dst_cpu))
 		return 0;
-#endif
 
 	/* Don't detach task if it is under active migration */
 	if (env->src_rq->push_task == p)
 		return 0;
+#endif
 
 	if (task_running(env->src_rq, p)) {
 		schedstat_inc(p->se.statistics.nr_failed_migrations_running);
@@ -8891,6 +8891,7 @@ static void detach_task(struct task_struct *p, struct lb_env *env)
 
 	p->on_rq = TASK_ON_RQ_MIGRATING;
 	deactivate_task(env->src_rq, p, DEQUEUE_NOCLOCK);
+#ifdef CONFIG_SCHED_WALT
 	lockdep_off();
 	double_lock_balance(env->src_rq, env->dst_rq);
 	if (!(env->src_rq->clock_update_flags & RQCF_UPDATED))
@@ -8898,6 +8899,9 @@ static void detach_task(struct task_struct *p, struct lb_env *env)
 	set_task_cpu(p, env->dst_cpu);
 	double_unlock_balance(env->src_rq, env->dst_rq);
 	lockdep_on();
+#else
+	set_task_cpu(p, env->dst_cpu);
+#endif
 }
 
 /*
@@ -9133,6 +9137,7 @@ static void attach_tasks(struct lb_env *env)
 	rq_unlock(env->dst_rq, &rf);
 }
 
+#ifdef CONFIG_NO_HZ_COMMON
 static inline bool cfs_rq_has_blocked(struct cfs_rq *cfs_rq)
 {
 	if (cfs_rq->avg.load_avg)
@@ -11161,6 +11166,7 @@ static int active_load_balance_cpu_stop(void *data)
 	struct rq_flags rf;
 	struct task_struct *push_task;
 	int push_task_detached = 0;
+#ifdef CONFIG_SCHED_WALT
 	struct lb_env env = {
 		.sd                     = sd,
 		.dst_cpu                = target_cpu,
@@ -11171,6 +11177,7 @@ static int active_load_balance_cpu_stop(void *data)
 		.flags                  = 0,
 		.loop                   = 0,
 	};
+#endif
 	bool moved = false;
 
 	rq_lock_irq(busiest_rq, &rf);
@@ -11198,6 +11205,7 @@ static int active_load_balance_cpu_stop(void *data)
 	 */
 	BUG_ON(busiest_rq == target_rq);
 
+#ifdef CONFIG_SCHED_WALT
 	push_task = busiest_rq->push_task;
 	target_cpu = busiest_rq->push_cpu;
 	if (push_task) {
@@ -11212,6 +11220,7 @@ static int active_load_balance_cpu_stop(void *data)
 		}
 		goto out_unlock;
 	}
+#endif
 
 	/* Search for an sd spanning us and the target CPU. */
 	rcu_read_lock();
@@ -11254,12 +11263,14 @@ static int active_load_balance_cpu_stop(void *data)
 	rcu_read_unlock();
 out_unlock:
 	busiest_rq->active_balance = 0;
+#ifdef CONFIG_SCHED_WALT
 	push_task = busiest_rq->push_task;
 	target_cpu = busiest_rq->push_cpu;
 	clear_reserved(target_cpu);
 
 	if (push_task)
 		busiest_rq->push_task = NULL;
+#endif
 
 	rq_unlock(busiest_rq, &rf);
 
@@ -11930,6 +11941,7 @@ static inline bool nohz_idle_balance(struct rq *this_rq, enum cpu_idle_type idle
 static inline void nohz_newidle_balance(struct rq *this_rq) { }
 #endif /* CONFIG_NO_HZ_COMMON */
 
+#ifdef CONFIG_SCHED_WALT
 static bool silver_has_big_tasks(void)
 {
 	int cpu;
@@ -11944,6 +11956,12 @@ static bool silver_has_big_tasks(void)
 
 	return false;
 }
+#else
+static inline bool silver_has_big_tasks(void)
+{
+	return false;
+}
+#endif
 
 /*
  * idle_balance is called by schedule() if this_cpu is about to become
@@ -11956,12 +11974,14 @@ static int idle_balance(struct rq *this_rq, struct rq_flags *rf)
 	struct sched_domain *sd;
 	int pulled_task = 0;
 	u64 curr_cost = 0;
-	u64 avg_idle = this_rq->avg_idle;
+        u64 avg_idle = this_rq->avg_idle;
+#ifdef CONFIG_SCHED_WALT
 	bool prefer_spread = prefer_spread_on_idle(this_cpu, true);
 	bool force_lb = (!is_min_capacity_cpu(this_cpu) &&
 				silver_has_big_tasks() &&
 				sysctl_sched_force_lb_enable &&
 				(atomic_read(&this_rq->nr_iowait) == 0));
+#endif
 
 
 	if (cpu_isolated(this_cpu))
@@ -11978,9 +11998,10 @@ static int idle_balance(struct rq *this_rq, struct rq_flags *rf)
 	 */
 	if (!cpu_active(this_cpu))
 		return 0;
-
+#ifdef CONFIG_SCHED_WALT
 	if (force_lb || prefer_spread)
 		avg_idle = ULLONG_MAX;
+#endif
 	/*
 	 * This is OK, because current is on_cpu, which avoids it being picked
 	 * for load-balance and preemption/IRQs are still disabled avoiding
@@ -12014,10 +12035,12 @@ static int idle_balance(struct rq *this_rq, struct rq_flags *rf)
 		if (!(sd->flags & SD_LOAD_BALANCE))
 			continue;
 
+#ifdef CONFIG_SCHED_WALT
 		if (prefer_spread && !force_lb &&
 			(sd->flags & SD_ASYM_CPUCAPACITY) &&
 			!is_asym_cap_cpu(this_cpu))
 			avg_idle = this_rq->avg_idle;
+#endif
 
 		if (avg_idle < curr_cost + sd->max_newidle_lb_cost) {
 			update_next_balance(sd, &next_balance);

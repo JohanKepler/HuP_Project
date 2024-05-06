@@ -841,11 +841,17 @@ endif
 ifdef CONFIG_LTO_CLANG
 ifdef CONFIG_THINLTO
 lto-clang-flags	:= -flto=thin
-KBUILD_LDFLAGS	+= --thinlto-cache-dir=.thinlto-cache
+lto-clang-flags += $(call cc-option, -fsplit-lto-unit)
 else
 lto-clang-flags	:= -flto
 endif
-lto-clang-flags += -fvisibility=default $(call cc-option, -fsplit-lto-unit)
+
+ifeq ($(SRCARCH),x86)
+# Workaround for compiler / linker bug
+lto-clang-flags	+= -fvisibility=hidden
+else
+lto-clang-flags	+= -fvisibility=default
+endif
 
 # Limit inlining across translation units to reduce binary size
 LD_FLAGS_LTO_CLANG := -mllvm -import-instr-limit=5

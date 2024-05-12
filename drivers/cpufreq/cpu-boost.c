@@ -79,7 +79,7 @@ static struct delayed_work input_boost_rem;
 static u64 last_input_time;
 #define MIN_INPUT_INTERVAL (150 * USEC_PER_MSEC)
 
-static struct kthread_worker cpu_boost_worker;
+static struct kthread_worker *cpu_boost_worker;
 static struct task_struct *cpu_boost_worker_thread;
 
 static ssize_t store_input_boost_freq(struct kobject *kobj,

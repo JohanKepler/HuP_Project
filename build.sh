@@ -5,7 +5,9 @@
 
 SECONDS=0 # builtin bash timer
 ZIPNAME="HuP-$(date '+%Y%m%d-%H%M').zip"
-TC_DIR="$(pwd)/tc/clang-r450784e"
+TC_DIR="$(pwd)/tc/neutron"
+TU="$(pwd)/tc"
+EY="$(pwd)"
 AK3_DIR="$(pwd)/android/AnyKernel3"
 DEFCONFIG="vendor/spes-perf_defconfig"
 

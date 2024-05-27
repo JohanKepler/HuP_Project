@@ -173,7 +173,7 @@ struct batt_params {
 	struct timespec		last_soc_change_time;
 };
 
-struct sm_fg_chip;
+//struct sm_fg_chip;
 
 struct sm_fg_chip {
 	struct device		*dev;
@@ -308,7 +308,7 @@ struct sm_fg_chip {
 	int dec_rate_len;
 	int	fake_chip_ok;	
 	struct dentry *debug_root;
-	struct power_supply* fg_psy;
+	struct power_supply *fg_psy;
 	struct power_supply *usb_psy;
 	struct power_supply *batt_psy;
 	struct power_supply *bbc_psy;

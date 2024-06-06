@@ -4,14 +4,16 @@
 # Copyright (C) 2020-2021 Adithya R.
 
 SECONDS=0 # builtin bash timer
-ZIPNAME="uvite-$(date '+%Y%m%d-%H%M')-spes.zip"
-TC_DIR="$(pwd)/tc/clang-r450784e"
+ZIPNAME="HuP-K$(date '+%Y%m%d-%H%M').zip"
+TC_DIR="$(pwd)/tc/neutron"
+TU="$(pwd)/tc"
+EY="$(pwd)"
 AK3_DIR="$(pwd)/android/AnyKernel3"
 DEFCONFIG="vendor/spes-perf_defconfig"
 
 if test -z "$(git rev-parse --show-cdup 2>/dev/null)" &&
    head=$(git rev-parse --verify HEAD 2>/dev/null); then
-	ZIPNAME="${ZIPNAME::-4}-$(echo $head | cut -c1-8).zip"
+	ZIPNAME="${ZIPNAME::-4}.zip"
 fi
 
 export PATH="$TC_DIR/bin:$PATH"
@@ -19,12 +21,21 @@ export KBUILD_BUILD_USER=nobody
 export KBUILD_BUILD_HOST=android-build
 
 if ! [ -d "$TC_DIR" ]; then
-	echo "AOSP clang not found! Cloning to $TC_DIR..."
-	if ! git clone --depth=1 -b 14 https://gitlab.com/ThankYouMario/android_prebuilts_clang-standalone "$TC_DIR"; then
-		echo "Cloning failed! Aborting..."
+	echo "Neutron clang not found! Cloning to $TC_DIR..."
+	if ! mkdir -p tc
+		cd "$TU"
+		mkdir -p neutron && wget https://github.com/Neutron-Toolchains/clang-build-catalogue/releases/download/10032024/neutron-clang-10032024.tar.zst 
+		tar -xvf neutron-clang-10032024.tar.zst -C "$TC_DIR"
+		rm -rf neutron-clang-10032024.tar.zst
+		cd "$EY"
+		"$TC_DIR"; then
+		echo "Cloning failed! Aborting..." && rm -rf "$TC_DIR"
 		exit 1
 	fi
 fi
+
+# KSU
+rm -rf KernelSU && curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 
 if [[ $1 = "-r" || $1 = "--regen" ]]; then
 	make O=out ARCH=arm64 $DEFCONFIG savedefconfig

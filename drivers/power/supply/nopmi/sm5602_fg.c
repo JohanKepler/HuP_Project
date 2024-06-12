@@ -3590,8 +3590,8 @@ static int sm_fg_probe(struct i2c_client *client,
 
 	if (!hal_fg_init(client)) {
 	    pr_err("Failed to Initialize Fuelgauge\n");
-		ret = -EIO;
-		goto err_0; 	
+		ret = -ENODEV; 
+        goto err_free; 	
 	}
 
 	fg_set_fastcharge_mode(sm, false);

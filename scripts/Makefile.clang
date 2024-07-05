@@ -12,6 +12,7 @@ CLANG_TARGET_FLAGS_s390		:= s390x-linux-gnu
 CLANG_TARGET_FLAGS_x86		:= x86_64-linux-gnu
 CLANG_TARGET_FLAGS		:= $(CLANG_TARGET_FLAGS_$(SRCARCH))
 
+<<<<<<< HEAD
 ifdef CONFIG_POLLY_CLANG
 KBUILD_CFLAGS	+= -mllvm -polly \
 		   -mllvm -polly-ast-use-context \
@@ -33,6 +34,8 @@ ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
 KBUILD_CFLAGS	+= -mllvm -polly-run-dce
 endif
 endif
+=======
+>>>>>>> 54f8f84e17f734f3a9b3140188ef95cd42f11d37
 ifeq ($(CLANG_TARGET_FLAGS),)
 $(error add '--target=' option to scripts/Makefile.clang)
 else

@@ -59,7 +59,7 @@ mkdir -p out
 make O=out ARCH=arm64 LLVM=1 $DEFCONFIG
 
 echo -e "\nStarting compilation...\n"
-make -j$(nproc --all) O=out ARCH=arm64 CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip LLVM=1 Image.gz dtbo.img 2> >(tee log.txt >&2) || exit $?
+make -j$(nproc --all) O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 Image.gz dtbo.img 2> >(tee log.txt >&2) || exit $?
 
 kernel="out/arch/arm64/boot/Image.gz"
 dtbo="out/arch/arm64/boot/dtbo.img"

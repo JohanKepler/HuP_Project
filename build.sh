@@ -4,8 +4,8 @@
 # Copyright (C) 2020-2021 Adithya R.
 
 SECONDS=0 # builtin bash timer
-ZIPNAME="uvite-$(date '+%Y%m%d-%H%M')-spes.zip"
-TC_DIR="$(pwd)/tc/clang-r450784e"
+ZIPNAME="delusion-r1-$(date '+%Y%m%d-%H%M')-spes.zip"
+TC_DIR="$(pwd)/tc/clang-r522817"
 AK3_DIR="$(pwd)/android/AnyKernel3"
 DEFCONFIG="vendor/spes-perf_defconfig"
 
@@ -20,7 +20,7 @@ export KBUILD_BUILD_HOST=android-build
 
 if ! [ -d "$TC_DIR" ]; then
 	echo "AOSP clang not found! Cloning to $TC_DIR..."
-	if ! git clone --depth=1 -b 14 https://gitlab.com/ThankYouMario/android_prebuilts_clang-standalone "$TC_DIR"; then
+	if ! git clone --depth=1 -b 18 https://gitlab.com/ThankYouMario/android_prebuilts_clang-standalone "$TC_DIR"; then
 		echo "Cloning failed! Aborting..."
 		exit 1
 	fi
@@ -57,7 +57,7 @@ if [ -f "$kernel" ]; then
 	echo -e "\nKernel compiled succesfully! Zipping up...\n"
 	if [ -d "$AK3_DIR" ]; then
 		cp -r $AK3_DIR AnyKernel3
-	elif ! git clone -q https://github.com/CHRISL7/AnyKernel3 -b master; then
+	elif ! git clone -q https://github.com/angelomds42/AnyKernel3 -b master; then
 		echo -e "\nAnyKernel3 repo not found locally and couldn't clone from GitHub! Aborting..."
 		exit 1
 	fi

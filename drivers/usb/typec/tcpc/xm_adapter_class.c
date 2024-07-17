@@ -420,7 +420,7 @@ static ssize_t request_vdm_cmd_store(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t size)
 {
 	struct adapter_device *adapter_dev = to_adapter_device(dev);
-	int cmd;
+	int cmd, ret;
 	unsigned char buffer[64];
 	unsigned char *data;
 	unsigned int count;
@@ -435,8 +435,8 @@ static ssize_t request_vdm_cmd_store(struct device *dev,
 	}
 	memset(data, 0, 40);
 
-	sscanf(buf, "%d,%s\n", &cmd, buffer);
-	class_info("%s:cmd:%d, buffer:%s\n", __func__, cmd, buffer);
+	ret = sscanf(buf, "%d,%s\n", &cmd, buffer);
+	class_info("%s:cmd:%d, buffer:%s, ret:%d\n", __func__, cmd, buffer, ret);
 
 	StringToHex(buffer, data, &count);
 	class_info("%s:count = %d\n", __func__, count);

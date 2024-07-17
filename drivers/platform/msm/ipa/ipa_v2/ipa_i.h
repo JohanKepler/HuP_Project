@@ -1708,7 +1708,7 @@ int ipa2_mhi_suspend_ul_channels(void);
 
 int ipa2_mhi_resume_channels_internal(enum ipa_client_type client,
 		bool LPTransitionRejected, bool brstmode_enabled,
-		union __packed gsi_channel_scratch ch_scratch, u8 index);
+		union gsi_channel_scratch ch_scratch, u8 index);
 
 /*
  * mux id
@@ -1744,6 +1744,9 @@ enum ipa_client_type ipa2_get_client_mapping(int pipe_idx);
 enum ipa_rm_resource_name ipa2_get_rm_resource_from_ep(int pipe_idx);
 
 bool ipa2_get_modem_cfg_emb_pipe_flt(void);
+
+int ipa2_get_smmu_params(struct ipa_smmu_in_params *in,
+        struct ipa_smmu_out_params *out);
 
 /* internal functions */
 

@@ -81,5 +81,3 @@ obj-$(CONFIG_FPR_FPC)		+= fpr_FingerprintCard/
 obj-y                           += qrc/
 obj-$(CONFIG_KINECTICS_XR_NORDIC) += kxrctrl/
 obj-y                           += board_id.o
-
-obj-$(CONFIG_KPROFILES) += kprofiles/

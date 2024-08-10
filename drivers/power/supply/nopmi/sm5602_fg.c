@@ -68,6 +68,14 @@
 #define SM_RAW_SOC_FULL		1000 //100.0%
 #define SM_RECHARGE_SOC		971 //98.5%
 
+#define ENABLE_MAP_SOC
+
+#ifdef ENABLE_MAP_SOC
+#define MAP_MAX_SOC		98
+#define MAP_RATE_SOC		985
+#define MAP_MIN_SOC		4
+#endif
+
 #define BMS_FG_VERIFY		"BMS_FG_VERIFY"
 #define BMS_FC_VOTER		"BMS_FC_VOTER"
 
@@ -1289,18 +1297,16 @@ static int fg_get_property(struct power_supply *psy,
 		mutex_lock(&sm->data_lock);
 		if (ret >= 0)
 			sm->batt_soc = ret;
-		if (sm->param.batt_soc >= 0)
-			val->intval = sm->param.batt_soc / 10;
-		else if ((ret >= 0) && (sm->param.batt_soc == -EINVAL))
-			val->intval = (sm->batt_soc > 16) ? ((sm->batt_soc * 10 + 96) / 97) : (sm->batt_soc / 10);
-		else
-			val->intval = 50;
-
-		/* capacity should be between 0% and 100% */
+#ifdef ENABLE_MAP_SOC
+		val->intval = (((100 * (sm->batt_soc * 10 + MAP_MAX_SOC)) / MAP_RATE_SOC) - MAP_MIN_SOC) / 10;
 		if (val->intval > 100)
 			val->intval = 100;
 		if (val->intval < 0)
 			val->intval = 0;
+#else
+		val->intval = sm->batt_soc / 10;
+#endif
+		pr_info("fg POWER_SUPPLY_PROP_STATUS: %d\n", val->intval);
 
 		mutex_unlock(&sm->data_lock);
 		if (sm->shutdown_delay_enable) {
@@ -1470,7 +1476,7 @@ static int fg_prop_is_writeable(struct power_supply *psy,
 
 	switch (prop) {
 	case POWER_SUPPLY_PROP_TEMP:
-	case POWER_SUPPLY_PROP_CAPACITY:
+	//case POWER_SUPPLY_PROP_CAPACITY:
 	case POWER_SUPPLY_PROP_FASTCHARGE_MODE:
 	case POWER_SUPPLY_PROP_CHIP_OK:
 		ret = 1;
